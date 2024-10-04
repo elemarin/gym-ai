@@ -43,27 +43,23 @@ export async function getWorkoutPlan(formData: FormData): Promise<WorkoutPlan> {
         },
         {
           role: "user",
-          content: [
+          content: `Create a detailed workout plan for training ${muscleGroup} with the goals of ${goals.join(', ')}. ${imagePrompt}
+
+            Please format your response as a JSON object with the following structure:
             {
-              type: "text",
-              text: `Create a detailed workout plan for training ${muscleGroup} with the goals of ${goals.join(', ')}. ${imagePrompt}
+              "mainWorkout": [
+                {"name": "Exercise Name", "sets": 3, "reps": "8-10", "instructions": "Brief instructions"}
+              ]
+            }
 
-                Please format your response as a JSON object with the following structure:
-                {
-                  "mainWorkout": [
-                    {"name": "Exercise Name", "sets": 3, "reps": "8-10", "instructions": "Brief instructions"}
-                  ]
-                }
-
-                Provide at least 4-5 exercises in the mainWorkout. Use only exercises from our database.`
-            },
-            ...imageDescriptions.map(({ base64 }) => ({
+            Provide at least 4-5 exercises in the mainWorkout. Use only exercises from our database.`,
+          ...imageDescriptions.map(({ base64 }) => ({
+            role: "user",
+            content: {
               type: "image_url",
-              image_url: {
-                "url": `data:image/jpeg;base64,${base64}`
-              }
-            }))
-          ]
+              image_url: `data:image/jpeg;base64,${base64}`
+            }
+          }))
         }
       ],
       response_format: { type: "json_object" },

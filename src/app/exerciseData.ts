@@ -10,8 +10,6 @@ export interface Exercise {
   secondaryMuscles: string[];
   instructions: string[];
   category: string;
-  images: string[];
-  id: string;
 }
 
 export const exercises: Exercise[] = exercisesData.exercises;
