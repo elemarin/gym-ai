@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Label } from "@/components/ui/label"
+import { ChevronLeft, ChevronRight } from "lucide-react"
+import { toast } from "@/hooks/use-toast"
 
 const muscleGroups = [
   { value: "Espalda", emoji: "🏋️" },
@@ -38,7 +40,9 @@ interface Exercise {
 }
 
 interface WorkoutPlan {
-  mainWorkout: Exercise[];
+  days: {
+    [key: number]: Exercise[];
+  };
 }
 
 export default function Home() {
@@ -51,6 +55,8 @@ export default function Home() {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState<boolean>(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const [currentDay, setCurrentDay] = useState<number>(1);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
@@ -74,6 +80,7 @@ export default function Home() {
 
   const handleSubmit = async () => {
     setIsLoading(true);
+    setError(null);
     const formData = new FormData();
     formData.set('muscleGroups', selectedMuscleGroups.join(','));
     formData.set('goals', selectedGoals.join(','));
@@ -88,7 +95,12 @@ export default function Home() {
       setIsBottomSheetOpen(true);
     } catch (error) {
       console.error('Error getting workout plan:', error);
-      setWorkoutPlan(null);
+      setError('An error occurred while generating your workout plan. Please try again.');
+      toast({
+        title: "Error",
+        description: "Failed to generate workout plan. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -214,31 +226,62 @@ export default function Home() {
         <Button 
           onClick={handleSubmit}
           className="w-full py-4 text-lg font-bold bg-cyan-700 hover:bg-cyan-800 transition-colors"
-          disabled={isLoading}
+          disabled={isLoading || !selectedWorkoutType || selectedMuscleGroups.length === 0 || selectedGoals.length === 0}
         >
           {isLoading ? 'Creando tu entrenamiento...' : 'Generar entrenamiento 💪'}
         </Button>
       </div>
 
       <Sheet open={isBottomSheetOpen} onOpenChange={setIsBottomSheetOpen}>
-        <SheetContent side="bottom" className="h-[80vh]">
-          <SheetHeader>
-            <SheetTitle className="text-2xl font-bold text-blue-600 mb-4">Tu Plan de Entrenamiento Personalizado</SheetTitle>
+        <SheetContent side="bottom" className="h-auto max-h-[80vh] px-0 overflow-hidden">
+          <SheetHeader className="px-6 py-4">
+            <SheetTitle className="text-2xl font-bold text-cyan-700">Tu Plan de Entrenamiento Personalizado</SheetTitle>
           </SheetHeader>
-          <SheetDescription>
-            <div ref={carouselRef} className="overflow-x-auto pb-4 -mx-6 px-6">
-              <div className="flex space-x-4" style={{ width: `${workoutPlan?.mainWorkout.length ?? 0 * 280}px` }}>
-                {workoutPlan?.mainWorkout.map((exercise, index) => (
-                  <div key={index} className="flex-shrink-0 w-64 border rounded-lg p-4 bg-white shadow-md">
-                    <h3 className="font-semibold text-lg mb-2 text-blue-600">{exercise.name}</h3>
-                    <p className="text-sm mb-1"><span className="font-semibold">Series:</span> {exercise.sets}</p>
-                    <p className="text-sm mb-2"><span className="font-semibold">Repeticiones:</span> {exercise.reps}</p>
-                    <p className="text-sm h-40 overflow-y-auto">{exercise.instructions}</p>
+          <div className="flex items-center justify-between px-6 py-3 bg-gray-100">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setCurrentDay(prev => Math.max(1, prev - 1))}
+              disabled={currentDay === 1}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-lg font-semibold">Día {currentDay}</span>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setCurrentDay(prev => Math.min(trainingDays, prev + 1))}
+              disabled={currentDay === trainingDays}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="px-6 py-4 overflow-x-auto">
+            <div className="flex space-x-4" style={{ width: `${(workoutPlan?.days[currentDay]?.length ?? 0) * 280}px` }}>
+              {workoutPlan?.days[currentDay]?.map((exercise, index) => (
+                <div key={index} className="flex-shrink-0 w-64 bg-white rounded-lg shadow-md overflow-hidden h-[400px] flex flex-col">
+                  <div className="bg-gray-300 h-40 w-full relative">
+                    <div className="absolute bottom-2 left-2 flex space-x-2">
+                      <span className="bg-cyan-700 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                        {exercise.sets} series
+                      </span>
+                      <span className="bg-cyan-700 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                        {exercise.reps} reps
+                      </span>
+                    </div>
                   </div>
-                ))}
-              </div>
+                  <div className="p-4 flex-grow flex flex-col">
+                    <h3 className="font-semibold text-lg mb-2 text-cyan-700">{exercise.name}</h3>
+                    <div className="text-sm text-gray-700 flex-grow overflow-hidden relative">
+                      <p className="line-clamp-4">{exercise.instructions}</p>
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white to-transparent h-6"></div>
+                    </div>
+                    <button className="text-cyan-700 text-sm font-semibold mt-2">Leer más</button>
+                  </div>
+                </div>
+              ))}
             </div>
-          </SheetDescription>
+          </div>
         </SheetContent>
       </Sheet>
     </div>
