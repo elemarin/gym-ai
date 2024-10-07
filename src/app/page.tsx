@@ -235,8 +235,8 @@ export default function Home() {
 
       <Sheet open={isBottomSheetOpen} onOpenChange={setIsBottomSheetOpen}>
         <SheetContent side="bottom" className="h-auto max-h-[80vh] px-0 overflow-hidden">
-          <SheetHeader className="px-6 py-4">
-            <SheetTitle className="text-2xl font-bold text-cyan-700">Tu Plan de Entrenamiento Personalizado</SheetTitle>
+          <SheetHeader className="">
+            <SheetTitle className="text-2xl font-bold text-cyan-700 mb-2">Tu Plan Personalizado</SheetTitle>
           </SheetHeader>
           <div className="flex items-center justify-between px-6 py-3 bg-gray-100">
             <Button
@@ -257,10 +257,10 @@ export default function Home() {
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-          <div className="px-6 py-4 overflow-x-auto">
+          <div className="px-6 py-4 overflow-x-auto snap-x snap-mandatory">
             <div className="flex space-x-4" style={{ width: `${(workoutPlan?.days[currentDay]?.length ?? 0) * 280}px` }}>
               {workoutPlan?.days[currentDay]?.map((exercise, index) => (
-                <div key={index} className="flex-shrink-0 w-64 bg-white rounded-lg shadow-md overflow-hidden h-[400px] flex flex-col">
+                <div key={index} className="flex-shrink-0 w-64 bg-white rounded-lg shadow-md overflow-hidden h-[400px] flex flex-col snap-center">
                   <div className="bg-gray-300 h-40 w-full relative">
                     <div className="absolute bottom-2 left-2 flex space-x-2">
                       <span className="bg-cyan-700 text-white px-2 py-1 rounded-full text-xs font-semibold">
@@ -271,13 +271,12 @@ export default function Home() {
                       </span>
                     </div>
                   </div>
-                  <div className="p-4 flex-grow flex flex-col">
-                    <h3 className="font-semibold text-lg mb-2 text-cyan-700">{exercise.name}</h3>
-                    <div className="text-sm text-gray-700 flex-grow overflow-hidden relative">
+                  <div className="p-2 flex-grow flex flex-col">
+                    <h3 className="font-semibold text-lg text-cyan-700">{exercise.name}</h3>
+                    <div className="text-xs text-gray-700 flex-grow overflow-hidden relative">
                       <p className="line-clamp-4">{exercise.instructions}</p>
                       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white to-transparent h-6"></div>
                     </div>
-                    <button className="text-cyan-700 text-sm font-semibold mt-2">Leer más</button>
                   </div>
                 </div>
               ))}
