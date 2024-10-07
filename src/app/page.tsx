@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { getWorkoutPlan } from "./getWorkoutPlan";
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Label } from "@/components/ui/label"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
@@ -56,6 +56,7 @@ export default function Home() {
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const carouselRef = useRef<HTMLDivElement>(null);
   const [currentDay, setCurrentDay] = useState<number>(1);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {

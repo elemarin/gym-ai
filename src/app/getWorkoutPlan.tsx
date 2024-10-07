@@ -1,6 +1,6 @@
 'use server';
 import { OpenAI } from "openai";
-import { WorkoutPlan, Exercise } from './types';
+import { WorkoutPlan } from './types';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
